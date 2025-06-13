@@ -1,6 +1,6 @@
 const AgarioClient = require('./lib/agario-client'); // asegúrate de tener esta carpeta con el cliente personalizado
 
-const NOMBRE_OBJETIVO = 'Bσм.ioz#Live1k🔴';
+const NOMBRE_OBJETIVO = '@Bσм.ioz';
 const TOTAL_BOTS = 28;
 
 const regiones = {
