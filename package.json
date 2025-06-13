@@ -1,13 +1,13 @@
 {
   "name": "agario-discord-bots",
   "version": "1.0.0",
-  "description": "Controlar bots en Agar.io desde Discord",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "discord.js": "^14.11.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "ws": "^8.13.0"
   }
 }
