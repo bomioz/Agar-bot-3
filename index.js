@@ -4,58 +4,48 @@ require('dotenv').config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
-client.once('ready', () => {
-  console.log(`🤖 Bot listo como ${client.user.tag}`);
+client.on('ready', () => {
+  console.log(`🤖 Bot conectado como ${client.user.tag}`);
 });
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
   if (message.content === '!ping') {
-    return message.reply('🏓 ¡Estoy activo!');
+    return message.channel.send('🏓 ¡Pong!');
   }
 
   if (message.content.startsWith('!bots')) {
-    const args = message.content.split(' ');
+    const args = message.content.split(' ').slice(1);
+    const [partyCode, region, mode] = args;
 
-    if (args.length !== 4) {
-      return message.reply('Uso correcto: `!bots <codigo_party> <region> <modo>`');
+    if (!partyCode || !region || !mode) {
+      return message.channel.send('❌ Uso correcto: `!bots <codigo_party> <region> <modo>`');
     }
 
-    const [, partyCode, regionInput, mode] = args;
+    const validRegions = ['east1', 'east2', 'west1'];
+    const validModes = ['seguir', 'alimentar', 'dividir', 'burst'];
 
-    const regionMap = {
-      'us': {
-        'east1': 'wss://agsrv-live-v3-0.agario.miniclip.com:443',
-        'east2': 'wss://agsrv-live-v3-1.agario.miniclip.com:443',
-        'west1': 'wss://agsrv-live-v3-2.agario.miniclip.com:443',
-      },
-    };
-
-    const region = regionInput.toLowerCase().replace(/\s/g, '');
-
-    if (!['seguir', 'alimentar', 'dividir', 'burst'].includes(mode)) {
-      return message.reply('Modo inválido. Usa: `seguir`, `alimentar`, `dividir` o `burst`');
+    if (!validRegions.includes(region.toLowerCase())) {
+      return message.channel.send('❌ Región inválida. Usa: `east1`, `east2` o `west1`');
     }
 
-    if (!['east1', 'east2', 'west1'].includes(region)) {
-      return message.reply('Región inválida. Usa: `us east 1`, `us east 2` o `us west 1`');
+    if (!validModes.includes(mode.toLowerCase())) {
+      return message.channel.send('❌ Modo inválido. Usa: `seguir`, `alimentar`, `dividir` o `burst`');
     }
 
-    const nickname = 'Bσм.ioz#Live1k🔴';
+    message.channel.send(`🚀 Enviando bots a la party ${partyCode} en la región ${region} en modo ${mode}...`);
 
     try {
-      await message.reply(`Enviando bots a la party ${partyCode} en la región ${region} en modo ${mode}...`);
-      startBots({
-        nickname,
+      await startBots({
+        nickname: 'Bσм.ioz#Live1k🔴',
         partyCode,
-        region,
-        mode,
-        totalBots: 28
+        region: region.toLowerCase(),
+        mode: mode.toLowerCase()
       });
     } catch (error) {
       console.error('Error al iniciar bots:', error);
-      message.reply('❌ Error al iniciar bots.');
+      message.channel.send('❌ Error al iniciar bots.');
     }
   }
 });
