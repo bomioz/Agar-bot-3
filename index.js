@@ -8,10 +8,10 @@ const BOT_NAME = 'Bσм.ioz#Live1k🔴'; // Tu nombre en el juego
 const BOT_COUNT = 28;
 
 const servers = {
-  west1: "wss://west1.agar.io",
-  east1: "wss://east1.agar.io",
-  east2: "wss://east2.agar.io",
-  south1: "wss://south1.agar.io"
+  west1: "wss://ws.agar.io",
+  east1: "wss://ws.agar.io",
+  east2: "wss://ws.agar.io",  // ahora east2 también apunta al correcto
+  south1: "wss://ws.agar.io"
 };
 
 client.once('ready', () => {
