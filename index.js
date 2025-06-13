@@ -1,22 +1,22 @@
-const validRegions = ['us east 1', 'us east 2', 'us west 1'];
+const validRegions = ['useast1', 'useast2', 'uswest1'];
 const validModes = ['seguir', 'alimentar', 'dividir', 'burst'];
 
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
-
   if (!message.content.startsWith('!bots')) return;
 
   const args = message.content.trim().split(/\s+/);
-  // !bots <partyCode> <region> <mode>
-  if (args.length !== 4) {
+
+  if (args.length < 4) {
     return message.channel.send('Uso correcto: `!bots <código_party> <región> <modo>`');
   }
 
   const partyCode = args[1];
-  const region = args[2].toLowerCase();
-  const mode = args[3].toLowerCase();
+  // Unir las palabras de región, ej: 'us east 1' => 'useast1'
+  const regionRaw = args.slice(2, args.length - 1).join('').toLowerCase();
+  const mode = args[args.length - 1].toLowerCase();
 
-  if (!validRegions.includes(region)) {
+  if (!validRegions.includes(regionRaw)) {
     return message.channel.send('Región inválida. Usa: `us east 1`, `us east 2` o `us west 1`');
   }
 
@@ -24,8 +24,7 @@ client.on('messageCreate', async message => {
     return message.channel.send('Modo inválido. Usa: `seguir`, `alimentar`, `dividir` o `burst`');
   }
 
-  // Aquí va el código para iniciar los bots con partyCode, region y mode
-  message.channel.send(`Enviando bots a la party ${partyCode} en la región ${region} en modo ${mode}...`);
+  message.channel.send(`Enviando bots a la party ${partyCode} en la región ${regionRaw} en modo ${mode}...`);
 
-  // TODO: Ejecutar la función para enviar bots según esos parámetros
+  // Aquí llamas la función que crea y manda los bots reales
 });
