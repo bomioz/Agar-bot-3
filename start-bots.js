@@ -1,6 +1,8 @@
 const AgarioClient = require('./lib/agario-client');
 
-function startBots({ nickname, partyCode, region, mode, totalBots = 28 }) {
+function startBots(config) {
+  const { nickname, partyCode, region, mode, totalBots = 28 } = config;
+
   const bots = [];
 
   for (let i = 0; i < totalBots; i++) {
@@ -41,4 +43,4 @@ function startBots({ nickname, partyCode, region, mode, totalBots = 28 }) {
   return bots;
 }
 
-module.exports = { startBots };
+module.exports = startBots;
