@@ -1,82 +1,44 @@
-const { Client, GatewayIntentBits } = require('discord.js');
-const WebSocket = require('ws');
 require('dotenv').config();
+const { Client, GatewayIntentBits } = require('discord.js');
+const startBots = require('./lib/startBots');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-
-const BOT_NAME = 'Bσм.ioz#Live1k🔴'; // Tu nombre en el juego
-const BOT_COUNT = 28;
-
-const servers = {
-  west1: "wss://ws.agar.io",
-  east1: "wss://ws.agar.io",
-  east2: "wss://ws.agar.io",  // ahora east2 también apunta al correcto
-  south1: "wss://ws.agar.io"
-};
-
-client.once('ready', () => {
-  console.log(`🤖 Bot de Discord conectado como ${client.user.tag}`);
+const bot = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-client.on('messageCreate', async (message) => {
-  if (message.author.bot) return;
+bot.once('ready', () => {
+  console.log(`🤖 Bot conectado como ${bot.user.tag}`);
+});
 
-  if (message.content === '!ping') {
-    return message.reply('🏓 Pong!');
+bot.on('messageCreate', async message => {
+  if (!message.content.startsWith('!bots') || message.author.bot) return;
+
+  const args = message.content.split(' ');
+  if (args.length !== 4) {
+    return message.reply('Uso correcto: `!bots <código_party> <región> <modo>`');
   }
 
-  if (message.content.startsWith('!bots')) {
-    const args = message.content.split(' ');
+  const [cmd, partyCode, region, mode] = args;
 
-    if (args.length !== 4) {
-      return message.reply('❌ Uso correcto: `!bots <código_party> <región> <modo>`');
-    }
+  const modosValidos = ['seguir', 'alimentar', 'dividir', 'burst'];
+  if (!modosValidos.includes(mode)) {
+    return message.reply('Modo inválido. Usa: `seguir`, `alimentar`, `dividir` o `burst`');
+  }
 
-    const party = args[1];
-    const region = args[2].toLowerCase();
-    const modo = args[3].toLowerCase();
+  try {
+    await startBots({
+      party: partyCode,
+      region: region,
+      mode: mode,
+      cantidad: 28,
+      objetivo: 'Bσм.ioz#Live1k🔴'
+    });
 
-    if (!['seguir', 'alimentar', 'dividir', 'burst'].includes(modo)) {
-      return message.reply('❌ Modo inválido. Usa: `seguir`, `alimentar`, `dividir` o `burst`');
-    }
-
-    if (!servers[region]) {
-      return message.reply('❌ Región inválida. Usa: west1, east1, east2, south1');
-    }
-
-    message.reply(`🚀 Enviando ${BOT_COUNT} bots a la party ${party} en la región ${region} en modo ${modo}...`);
-
-    try {
-      for (let i = 0; i < BOT_COUNT; i++) {
-        conectarBot(party, region, modo);
-      }
-    } catch (error) {
-      console.error('❌ Error al enviar bots:', error);
-      message.reply('❌ Error al enviar bots. Revisa la consola.');
-    }
+    message.reply(`Enviando bots a la party ${partyCode} en la región ${region} en modo ${mode}...`);
+  } catch (err) {
+    console.error('❌ Error al enviar bots:', err);
+    message.reply(`Error al enviar bots: ${err.message}`);
   }
 });
 
-function conectarBot(party, region, modo) {
-  const ws = new WebSocket(servers[region]);
-
-  ws.on('open', () => {
-    console.log(`✅ Bot conectado a ${region}`);
-    ws.send(JSON.stringify({ type: "join", party: party, name: BOT_NAME }));
-  });
-
-  ws.on('message', (data) => {
-    const mensaje = data.toString();
-    // Aquí puedes poner lógica más avanzada si el cliente lo permite
-  });
-
-  ws.on('error', (err) => {
-    console.error('❌ Error al conectar:', err.message);
-  });
-
-  ws.on('close', () => {
-    console.log('🔌 Conexión cerrada');
-  });
-}
-
-client.login(process.env.DISCORD_TOKEN);
+bot.login(process.env.DISCORD_TOKEN);
